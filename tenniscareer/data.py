@@ -28,6 +28,17 @@ def _parse_career_js(text):
     return json.loads(data)
 
 
+def _opponent_age_from_row(row):
+    value = row[16]
+    if not value:
+        return float("nan")
+    if value.isdigit() and len(value) == 8:
+        match_date = pd.to_datetime(row[0], format="%Y%m%d")
+        birth_date = pd.to_datetime(value, format="%Y%m%d")
+        return (match_date - birth_date).days / 365.25
+    return float(value)
+
+
 def _matches_to_dataframe(matches):
     return pd.DataFrame({
         "match_date": [row[0] for row in matches],
@@ -35,6 +46,7 @@ def _matches_to_dataframe(matches):
         "surface": [row[2] for row in matches],
         "result": [row[4] for row in matches],
         "opponent": [row[11] for row in matches],
+        "opponent_age": [_opponent_age_from_row(row) for row in matches],
     })
 
 
