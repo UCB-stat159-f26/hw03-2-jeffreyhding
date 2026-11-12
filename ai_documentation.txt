@@ -21,3 +21,12 @@ Response:
 No extra library is needed. Python has built-in exception handling, and since the package is already using urllib to make requests, urllib.error.HTTPError is a natural exception to catch when a requested Tennis Abstract page does not exist.
 
 Instead of only printing a command-line message such as "Player not found," it is better to raise a clearer exception, such as ValueError("Player not found: ..."). Printing a message tells the user what happened, but raising an exception also signals to other code and tests that the operation failed. A custom exception could be created, but ValueError is sufficient for this assignment.
+
+
+Question:
+How do you meaningfully test a plotting function?
+
+Response:
+A plotting function should usually be tested by checking the structure and properties of the Matplotlib objects it creates rather than comparing image files pixel-by-pixel. For example, a test can verify that the function returns a Figure and Axes, that the expected title and axis labels are present, and that the correct number of plotted data series or legend entries were created.
+
+This makes the test more stable than image comparison because small rendering differences between Matplotlib versions or operating systems do not cause failures. Visual inspection can still be useful during development, but automated tests should focus on the plot's intended behavior and content.
