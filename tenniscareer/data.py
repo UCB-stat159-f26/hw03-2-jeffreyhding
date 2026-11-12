@@ -74,3 +74,14 @@ def _extract_player_birth_date(player_data):
     if match is None:
         raise ValueError("Could not find player birth date")
     return pd.to_datetime(match.group(1), format="%Y%m%d")
+
+
+def _add_player_age_columns(df, birth_date):
+    enriched = df.copy()
+    enriched["player_age"] = (
+        (enriched["match_date"] - birth_date).dt.days / 365.25
+    )
+    enriched["age_difference"] = (
+        enriched["player_age"] - enriched["opponent_age"]
+    )
+    return enriched
