@@ -1,3 +1,4 @@
+import json
 from urllib.request import Request, urlopen
 
 BASE_URL = "https://www.tennisabstract.com/jsmatches"
@@ -19,3 +20,8 @@ def _download_career_data(player_name):
     request = Request(_career_url(player_name), headers={"User-Agent": "Mozilla/5.0"})
     with urlopen(request) as response:
         return response.read().decode("utf-8")
+
+
+def _parse_career_js(text):
+    data = text.split("=", 1)[1].strip().rstrip(";")
+    return json.loads(data)
