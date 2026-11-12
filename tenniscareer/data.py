@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from urllib.request import Request, urlopen
 
 BASE_URL = "https://www.tennisabstract.com/jsmatches"
@@ -25,3 +26,13 @@ def _download_career_data(player_name):
 def _parse_career_js(text):
     data = text.split("=", 1)[1].strip().rstrip(";")
     return json.loads(data)
+
+
+def _matches_to_dataframe(matches):
+    return pd.DataFrame({
+        "match_date": [row[0] for row in matches],
+        "tournament": [row[1] for row in matches],
+        "surface": [row[2] for row in matches],
+        "result": [row[4] for row in matches],
+        "opponent": [row[11] for row in matches],
+    })
