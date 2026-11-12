@@ -36,3 +36,10 @@ def _matches_to_dataframe(matches):
         "result": [row[4] for row in matches],
         "opponent": [row[11] for row in matches],
     })
+
+
+def _clean_match_dataframe(df):
+    clean = df.copy()
+    clean["match_date"] = pd.to_datetime(clean["match_date"], format="%Y%m%d")
+    clean = clean[clean["result"].isin(["W", "L"])]
+    return clean.reset_index(drop=True)
