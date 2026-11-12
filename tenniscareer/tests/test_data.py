@@ -127,7 +127,7 @@ def test_get_player_matches_with_mock_data(monkeypatch):
         data_module, "_download_player_data", lambda player_name: SERENA_PLAYER_JS
     )
 
-    df = get_player_matches("Serena Williams")
+    df = get_player_matches("serena williams")
 
     assert len(df) == 3
     assert list(df.columns) == [
@@ -141,6 +141,7 @@ def test_get_player_matches_with_mock_data(monkeypatch):
         "age_difference",
     ]
     assert df.loc[0, "opponent"] == "Anne Miller"
+    assert df.attrs["player_name"] == "Serena Williams"
 
 
 def test_get_player_matches_invalid_player(monkeypatch):
