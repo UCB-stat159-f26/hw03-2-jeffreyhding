@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 
 from tenniscareer.data import (
+    _add_player_age_columns,
     _clean_match_dataframe,
     _format_player_name,
     _matches_to_dataframe,
@@ -85,3 +86,30 @@ def test_extract_player_birth_date():
 def test_missing_player_birth_date():
     with pytest.raises(ValueError, match="Could not find player birth date"):
         _extract_player_birth_date("var fullname = 'Unknown Player';")
+
+
+def test_add_player_age_columns_for_female_data():
+    matches = _parse_career_js(FEMALE_JS)
+    df = _clean_match_dataframe(_matches_to_dataframe(matches))
+    birth_date = _extract_player_birth_date(SERENA_PLAYER_JS)
+    df = _add_player_age_columns(df, birth_date)
+
+    player_age = float(df.loc[0, "player_age"])
+    age_difference = float(df.loc[0, "age_difference"])
+
+    assert player_age == pytest.approx(14.09, abs=0.01)
+    assert age_difference < 0
+
+
+def test_add_player_age_columns_for_male_data():
+    matches = _parse_career_js(MALE_JS)
+    df = _clean_match_dataframe(_matches_to_dataframe(matches))
+    birth_date = _extract_player_birth_date(NADAL_PLAYER_JS)
+    df = _add_player_age_columns(df, birth_date)
+
+    player_age = float(df.loc[0, "player_age"])
+    opponent_age = float(df.loc[0, "opponent_age"])
+    age_difference = float(df.loc[0, "age_difference"])
+
+    assert player_age == pytest.approx(15.27, abs=0.01)
+    assert age_difference == pytest.approx(player_age - opponent_age)
