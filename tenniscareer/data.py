@@ -1,4 +1,5 @@
 import json
+import re
 import pandas as pd
 from urllib.request import Request, urlopen
 
@@ -55,3 +56,21 @@ def _clean_match_dataframe(df):
     clean["match_date"] = pd.to_datetime(clean["match_date"], format="%Y%m%d")
     clean = clean[clean["result"].isin(["W", "L"])]
     return clean.reset_index(drop=True)
+
+
+def _player_url(player_name):
+    player = _format_player_name(player_name)
+    return f"{BASE_URL}/{player}.js"
+
+
+def _download_player_data(player_name):
+    request = Request(_player_url(player_name), headers={"User-Agent": "Mozilla/5.0"})
+    with urlopen(request) as response:
+        return response.read().decode("utf-8")
+
+
+def _extract_player_birth_date(player_data):
+    match = re.search(r"var\s+dob\s*=\s*(\d{8})", player_data)
+    if match is None:
+        raise ValueError("Could not find player birth date")
+    return pd.to_datetime(match.group(1), format="%Y%m%d")
