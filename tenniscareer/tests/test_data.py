@@ -7,9 +7,16 @@ from tenniscareer.data import (
     _matches_to_dataframe,
     _opponent_age_from_row,
     _parse_career_js,
+    _extract_player_birth_date,
+    _player_url,
 )
 
-from .mock_data import FEMALE_JS, MALE_JS
+from .mock_data import (
+    FEMALE_JS,
+    MALE_JS,
+    NADAL_PLAYER_JS,
+    SERENA_PLAYER_JS,
+)
 
 
 def test_format_player_name():
@@ -63,3 +70,18 @@ def test_male_opponent_age_from_age_field():
     matches = _parse_career_js(MALE_JS)
     age = _opponent_age_from_row(matches[0])
     assert age == pytest.approx(22.2642, abs=0.001)
+
+
+def test_player_metadata_url():
+    assert _player_url("Serena Williams").endswith("/SerenaWilliams.js")
+    assert _player_url("Rafael Nadal").endswith("/RafaelNadal.js")
+
+
+def test_extract_player_birth_date():
+    assert _extract_player_birth_date(SERENA_PLAYER_JS) == pd.Timestamp("1981-09-26")
+    assert _extract_player_birth_date(NADAL_PLAYER_JS) == pd.Timestamp("1986-06-03")
+
+
+def test_missing_player_birth_date():
+    with pytest.raises(ValueError, match="Could not find player birth date"):
+        _extract_player_birth_date("var fullname = 'Unknown Player';")
