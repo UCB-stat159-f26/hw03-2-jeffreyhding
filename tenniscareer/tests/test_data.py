@@ -1,10 +1,14 @@
 import pandas as pd
 import pytest
+from urllib.error import HTTPError
+
+import tenniscareer.data as data_module
 
 from tenniscareer.data import (
     _add_player_age_columns,
     _clean_match_dataframe,
     _format_player_name,
+    get_player_matches,
     _matches_to_dataframe,
     _opponent_age_from_row,
     _parse_career_js,
@@ -113,3 +117,45 @@ def test_add_player_age_columns_for_male_data():
 
     assert player_age == pytest.approx(15.27, abs=0.01)
     assert age_difference == pytest.approx(player_age - opponent_age)
+
+
+def test_get_player_matches_with_mock_data(monkeypatch):
+    monkeypatch.setattr(
+        data_module, "_download_career_data", lambda player_name: FEMALE_JS
+    )
+    monkeypatch.setattr(
+        data_module, "_download_player_data", lambda player_name: SERENA_PLAYER_JS
+    )
+
+    df = get_player_matches("Serena Williams")
+
+    assert len(df) == 3
+    assert list(df.columns) == [
+        "match_date",
+        "tournament",
+        "surface",
+        "result",
+        "opponent",
+        "opponent_age",
+        "player_age",
+        "age_difference",
+    ]
+    assert df.loc[0, "opponent"] == "Anne Miller"
+
+
+def test_get_player_matches_invalid_player(monkeypatch):
+    def raise_http_error(player_name):
+        raise HTTPError(
+            url="mock",
+            code=404,
+            msg="Not Found",
+            hdrs=None,
+            fp=None,
+        )
+
+    monkeypatch.setattr(
+        data_module, "_download_career_data", raise_http_error
+    )
+
+    with pytest.raises(ValueError, match="Player not found: Richaun Holmes"):
+        get_player_matches("Richaun Holmes")
