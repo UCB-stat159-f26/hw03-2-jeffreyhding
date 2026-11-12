@@ -1,6 +1,7 @@
 import json
 import re
 import pandas as pd
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 BASE_URL = "https://www.tennisabstract.com/jsmatches"
@@ -85,3 +86,16 @@ def _add_player_age_columns(df, birth_date):
         enriched["player_age"] - enriched["opponent_age"]
     )
     return enriched
+
+
+
+def get_player_matches(player_name):
+    try:
+        matches = _parse_career_js(_download_career_data(player_name))
+        player_data = _download_player_data(player_name)
+    except HTTPError as error:
+        raise ValueError(f"Player not found: {player_name}") from None
+
+    df = _clean_match_dataframe(_matches_to_dataframe(matches))
+    birth_date = _extract_player_birth_date(player_data)
+    return _add_player_age_columns(df, birth_date)
