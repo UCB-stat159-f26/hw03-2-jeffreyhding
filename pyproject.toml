@@ -11,3 +11,7 @@ dependencies = [
     "matplotlib",
     "pandas"
 ]
+[project.optional-dependencies]
+test = [
+    "pytest"
+]
