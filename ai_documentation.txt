@@ -5,3 +5,9 @@ Response:
 It should be done toward the start, after you've established the basic package name/layout but before you've developed much functionality.
 
 The reason is that pyproject.toml isn't final cleanup or documentation. It defines how the package is built and installed, along with core package metadata and dependencies. Having it early means we can install tenniscareer in editable mode while developing it and continuously verify that we're actually building an installable package—the exact thing HW03 will ultimately grade by installing directly from GitHub.
+
+Question:
+How do I implement tests for a Python package?
+
+Response:
+Use pytest and place test files in the package's tests/ directory, with filenames beginning with test_. Each test calls a package function with controlled input and uses assert statements to check that the output matches the expected behavior. For functions that normally depend on external websites, tests should use fixed mock data instead of making live web requests. This makes the tests fast, reproducible, and independent of whether the external website is available. The full package test suite can then be run with pytest tenniscareer.
