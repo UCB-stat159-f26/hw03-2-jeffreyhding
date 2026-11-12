@@ -98,4 +98,6 @@ def get_player_matches(player_name):
 
     df = _clean_match_dataframe(_matches_to_dataframe(matches))
     birth_date = _extract_player_birth_date(player_data)
-    return _add_player_age_columns(df, birth_date)
+    df = _add_player_age_columns(df, birth_date)
+    df.attrs["player_name"] = " ".join(player_name.split())
+    return df
