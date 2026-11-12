@@ -70,6 +70,13 @@ def _download_player_data(player_name):
         return response.read().decode("utf-8")
 
 
+def _extract_player_name(player_data):
+    match = re.search(r"var\s+fullname\s*=\s*['\"]([^'\"]+)['\"]", player_data)
+    if match is None:
+        raise ValueError("Could not find player name")
+    return match.group(1)
+
+
 def _extract_player_birth_date(player_data):
     match = re.search(r"var\s+dob\s*=\s*(\d{8})", player_data)
     if match is None:
@@ -99,5 +106,5 @@ def get_player_matches(player_name):
     df = _clean_match_dataframe(_matches_to_dataframe(matches))
     birth_date = _extract_player_birth_date(player_data)
     df = _add_player_age_columns(df, birth_date)
-    df.attrs["player_name"] = " ".join(player_name.split())
+    df.attrs["player_name"] = _extract_player_name(player_data)
     return df
